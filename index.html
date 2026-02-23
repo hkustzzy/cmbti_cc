@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 猫咪性格测试 CMBTI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration">
+        <div class="paw-print paw-1">🐾</div>
+        <div class="paw-print paw-2">🐾</div>
+        <div class="paw-print paw-3">🐾</div>
+        <div class="paw-print paw-4">🐾</div>
+        <div class="paw-print paw-5">🐾</div>
+    </div>
+
+    <!-- 欢迎页面 -->
+    <div id="welcome-page" class="page active">
+        <div class="container">
+            <div class="title-section">
+                <div class="logo-emoji">😺</div>
+                <h1 class="main-title">猫咪性格测试</h1>
+                <p class="subtitle">CMBTI · Cat MBTI Personality Test</p>
+            </div>
+
+            <div class="welcome-content">
+                <div class="cat-emoji">
+                    <span class="cat-icon">😸</span>
+                    <span class="cat-icon">😻</span>
+                    <span class="cat-icon">😽</span>
+                </div>
+                <p class="welcome-text">想知道你家主子是什么性格吗?</p>
+                <p class="welcome-subtext">通过 12 道精心设计的问题<br>揭秘喵星人的真实人设!</p>
+
+                <div class="input-section">
+                    <label for="cat-name">
+                        <span class="label-icon">✨</span>
+                        请输入你家猫咪的名字
+                    </label>
+                    <input type="text" id="cat-name" placeholder="例如: 团子、布丁、咪咪..." maxlength="20">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="startTest()">
+                        <span class="btn-icon">🐾</span>
+                        开始测试
+                    </button>
+                    <button class="btn-secondary" onclick="showAllPersonalities()">
+                        <span class="btn-icon">📖</span>
+                        查看所有性格
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 测试页面 -->
+    <div id="test-page" class="page">
+        <div class="container">
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">
+                    <span class="progress-icon">🐱</span>
+                    第 <span class="progress-number">1</span> 题 / 共 12 题
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="dimension-badge" id="dimension-title"></div>
+                <h3 class="question-text" id="question-text"></h3>
+
+                <div class="options">
+                    <button class="option-btn" onclick="selectOption('A')">
+                        <span class="option-label">A</span>
+                        <span class="option-text" id="option-a"></span>
+                        <span class="option-check">✓</span>
+                    </button>
+                    <button class="option-btn" onclick="selectOption('B')">
+                        <span class="option-label">B</span>
+                        <span class="option-text" id="option-b"></span>
+                        <span class="option-check">✓</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结果页面 -->
+    <div id="result-page" class="page">
+        <div class="container">
+            <div class="result-content">
+                <div class="result-badge">测试结果</div>
+                <div class="result-card">
+                    <div class="result-image-wrapper">
+                        <img id="result-image" class="result-image" src="" alt="猫咪性格图片">
+                    </div>
+                    <div class="result-info">
+                        <h2 id="cat-name-display" class="cat-name-display"></h2>
+                        <div class="personality-type-wrapper">
+                            <div class="personality-type" id="personality-type"></div>
+                        </div>
+                        <div class="personality-title" id="personality-title"></div>
+                        <div class="personality-desc-wrapper">
+                            <p class="personality-desc" id="personality-desc"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-secondary" onclick="restartTest()">
+                        <span class="btn-icon">🔄</span>
+                        重新测试
+                    </button>
+                    <button class="btn-primary" onclick="downloadResult()">
+                        <span class="btn-icon">📸</span>
+                        保存图片
+                    </button>
+                    <button class="btn-secondary" onclick="shareResult()">
+                        <span class="btn-icon">✨</span>
+                        分享结果
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 所有性格页面 -->
+    <div id="all-personalities-page" class="page">
+        <div class="container-wide">
+            <div class="all-header">
+                <h1 class="all-title">
+                    <span class="title-icon">😺</span>
+                    16 种猫咪性格图鉴
+                </h1>
+                <button class="btn-back" onclick="backToWelcome()">
+                    <span class="btn-icon">←</span>
+                    返回首页
+                </button>
+            </div>
+
+            <div class="personalities-grid" id="personalities-grid">
+                <!-- 通过 JavaScript 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
