@@ -288,7 +288,7 @@ body {
 
 /* ===== 测试页面样式 ===== */
 .progress-section {
-    margin-bottom: 35px;
+    margin-bottom: 30px;
 }
 
 .progress-bar {
@@ -327,27 +327,20 @@ body {
 }
 
 .question-card {
-    margin-top: 30px;
+    margin-top: 25px;
 }
 
 .dimension-badge {
-    display: inline-block;
-    font-size: 1em;
-    color: white;
-    background: linear-gradient(135deg, #ff6b6b, #ff8787);
-    padding: 10px 25px;
-    border-radius: 25px;
-    margin-bottom: 30px;
-    font-weight: 700;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    display: none; /* 隐藏维度标签 */
 }
 
 .question-text {
-    font-size: 1.5em;
+    font-size: 1.4em;
     color: #333;
-    margin-bottom: 40px;
+    margin-bottom: 35px;
     line-height: 1.7;
     font-weight: 700;
+    text-align: center;
 }
 
 .options {
@@ -435,52 +428,52 @@ body {
 
 .result-badge {
     display: inline-block;
-    font-size: 1.3em;
+    font-size: 1.1em;
     color: white;
     background: linear-gradient(135deg, #ff6b6b, #ff8787);
-    padding: 12px 35px;
-    border-radius: 30px;
-    margin-bottom: 35px;
+    padding: 10px 28px;
+    border-radius: 25px;
+    margin-bottom: 25px;
     font-weight: 700;
     box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
 .result-card {
     background: linear-gradient(135deg, #fff8f8, #ffecd2);
-    border-radius: 25px;
-    padding: 45px;
-    margin-bottom: 35px;
+    border-radius: 22px;
+    padding: 30px;
+    margin-bottom: 25px;
     box-shadow: inset 0 2px 10px rgba(255, 107, 107, 0.1);
 }
 
 .result-image-wrapper {
-    margin-bottom: 35px;
+    margin-bottom: 25px;
 }
 
 .result-image {
     width: 100%;
-    max-width: 420px;
+    max-width: 350px;
     height: auto;
-    border-radius: 25px;
+    border-radius: 20px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
     object-fit: contain;
-    border: 5px solid white;
+    border: 4px solid white;
 }
 
 .cat-name-display {
-    font-size: 2em;
+    font-size: 1.6em;
     color: #333;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     font-weight: 700;
 }
 
 .personality-type-wrapper {
-    margin: 25px 0;
+    margin: 20px 0;
 }
 
 .personality-type {
     display: inline-block;
-    font-size: 3.5em;
+    font-size: 3em;
     background: linear-gradient(135deg, #ff6b6b, #ff8787, #ffa5a5);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -491,23 +484,23 @@ body {
 }
 
 .personality-title {
-    font-size: 2em;
+    font-size: 1.7em;
     color: #ff8787;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-weight: 700;
 }
 
 .personality-desc-wrapper {
     background: white;
-    border-radius: 20px;
-    padding: 25px;
+    border-radius: 18px;
+    padding: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .personality-desc {
-    font-size: 1.25em;
+    font-size: 1.1em;
     color: #555;
-    line-height: 1.9;
+    line-height: 1.8;
     font-weight: 500;
 }
 
@@ -708,15 +701,37 @@ body {
     }
 
     .question-text {
-        font-size: 1.2em;
+        font-size: 1.15em;
+    }
+
+    .result-badge {
+        font-size: 1em;
+        padding: 8px 22px;
+        margin-bottom: 20px;
+    }
+
+    .result-card {
+        padding: 25px 20px;
     }
 
     .result-image {
-        max-width: 300px;
+        max-width: 280px;
+    }
+
+    .cat-name-display {
+        font-size: 1.4em;
     }
 
     .personality-type {
-        font-size: 2.8em;
+        font-size: 2.5em;
+    }
+
+    .personality-title {
+        font-size: 1.4em;
+    }
+
+    .personality-desc {
+        font-size: 1em;
     }
 
     .personalities-grid {

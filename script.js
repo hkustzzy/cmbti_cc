@@ -178,6 +178,17 @@ const questions = [
 let currentQuestion = 0;
 let answers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
 let catName = '';
+let shuffledQuestions = []; // 打乱后的题目顺序
+
+// 打乱数组顺序
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
 
 // 显示所有性格页面
 function showAllPersonalities() {
@@ -224,6 +235,9 @@ function startTest() {
     answers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
     currentQuestion = 0;
 
+    // 打乱题目顺序
+    shuffledQuestions = shuffleArray(questions);
+
     // 切换到测试页面
     showPage('test-page');
     loadQuestion();
@@ -239,10 +253,10 @@ function showPage(pageId) {
 
 // 加载题目
 function loadQuestion() {
-    const question = questions[currentQuestion];
+    const question = shuffledQuestions[currentQuestion];
 
     // 更新进度条
-    const progress = ((currentQuestion + 1) / questions.length) * 100;
+    const progress = ((currentQuestion + 1) / shuffledQuestions.length) * 100;
     document.getElementById('progress-fill').style.width = progress + '%';
 
     // 更新进度文字 - 只更新数字部分
@@ -251,11 +265,11 @@ function loadQuestion() {
     if (numberSpan) {
         numberSpan.textContent = currentQuestion + 1;
     } else {
-        progressTextEl.innerHTML = `<span class="progress-icon">🐱</span>第 <span class="progress-number">${currentQuestion + 1}</span> 题 / 共 ${questions.length} 题`;
+        progressTextEl.innerHTML = `<span class="progress-icon">🐱</span>第 <span class="progress-number">${currentQuestion + 1}</span> 题 / 共 ${shuffledQuestions.length} 题`;
     }
 
-    // 更新题目内容
-    document.getElementById('dimension-title').textContent = question.dimension;
+    // 隐藏维度信息,只显示题目
+    document.getElementById('dimension-title').style.display = 'none';
     document.getElementById('question-text').textContent = question.question;
     document.getElementById('option-a').textContent = question.optionA;
     document.getElementById('option-b').textContent = question.optionB;
@@ -263,7 +277,7 @@ function loadQuestion() {
 
 // 选择选项
 function selectOption(option) {
-    const question = questions[currentQuestion];
+    const question = shuffledQuestions[currentQuestion];
     const dimensionType = question.dimension_type;
 
     // 记录答案
@@ -276,7 +290,7 @@ function selectOption(option) {
     // 下一题或显示结果
     currentQuestion++;
 
-    if (currentQuestion < questions.length) {
+    if (currentQuestion < shuffledQuestions.length) {
         setTimeout(() => {
             loadQuestion();
         }, 300);
