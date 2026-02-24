@@ -11,7 +11,7 @@ const AI_CONFIG = {
   JPEG_QUALITY: 0.9,      // JPEG 压缩质量
 };
 
-const AI_PROMPT = "Use the cat from image 2, apply the costume, scene, and expression from image 1. The cat's appearance must be exactly the same as image 2.";
+const AI_PROMPT = "Use the cat from image 2, apply the costume, scene, and expression from image 1. The cat's appearance must be exactly the same as image 2. Use a white background.";
 
 // 将图片压缩并转为 base64 data URL
 function compressImageToDataURL(source) {
