@@ -11,7 +11,7 @@ const AI_CONFIG = {
   JPEG_QUALITY: 0.9,      // JPEG 压缩质量
 };
 
-const AI_PROMPT = "Use the cat from image 2, apply the costume, scene, and expression from image 1. The cat in the result MUST strictly match image 2 in breed, fur color, fur pattern, markings, eye color, face shape, and body proportions. Do not change or stylize the cat's appearance in any way. Use a white background.";
+const AI_PROMPT = "Use the cat from image 2, apply the costume, scene, and expression from image 1. CRITICAL: The cat in the result MUST be a photorealistic copy of the exact same cat from image 2. Strictly preserve the cat's breed, fur color, fur pattern, markings, eye color, face shape, ear shape, nose color, and body proportions from image 2. If image 2 shows a Ragdoll cat, the result must clearly be a Ragdoll with the same color points and blue eyes. Do not simplify, stylize, or alter the cat's real appearance. Use a white background.";
 
 // 将图片压缩并转为 base64 data URL
 function compressImageToDataURL(source) {
