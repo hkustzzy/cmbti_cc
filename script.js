@@ -406,6 +406,35 @@ function copyToClipboard(text) {
     }
 }
 
+// 显示图片保存弹窗
+function showSaveModal(dataURL) {
+    const modal = document.getElementById('save-modal');
+    const img = document.getElementById('save-modal-image');
+    img.src = dataURL;
+    modal.classList.add('active');
+}
+
+// 关闭图片保存弹窗
+function closeSaveModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.getElementById('save-modal');
+    modal.classList.remove('active');
+}
+
+// 保存 canvas 为图片（弹窗显示 + 桌面端尝试下载）
+function saveCanvasImage(canvas, filename) {
+    const dataURL = canvas.toDataURL('image/png');
+    // 移动端或微信：弹窗让用户长按保存
+    showSaveModal(dataURL);
+    // 桌面端同时尝试下载
+    if (!/Mobile|Android|iPhone/i.test(navigator.userAgent)) {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = dataURL;
+        link.click();
+    }
+}
+
 // 下载结果图片 - 方案1: 直接下载猫咪图片+文字截图提示
 async function downloadResult() {
     const personalityType = document.getElementById('personality-type').textContent;
@@ -531,32 +560,14 @@ async function downloadResult() {
             tempCtx.textAlign = 'center';
             tempCtx.fillText('🐱 CMBTI 猫咪性格测试', tempCanvas.width / 2, finalHeight - 30);
 
-            // 下载新canvas
-            tempCanvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.download = `${catName}-${personalityType}-CMBTI.png`;
-                link.href = url;
-                link.click();
-                URL.revokeObjectURL(url);
-                alert('图片已保存成功! 📸');
-            }, 'image/png');
+            saveCanvasImage(tempCanvas, `${catName}-${personalityType}-CMBTI.png`);
         } else {
             // 绘制底部水印
             ctx.fillStyle = '#aaa';
             ctx.font = '20px Arial, sans-serif';
             ctx.fillText('🐱 CMBTI 猫咪性格测试', canvas.width / 2, canvas.height - 30);
 
-            // 下载图片
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.download = `${catName}-${personalityType}-CMBTI.png`;
-                link.href = url;
-                link.click();
-                URL.revokeObjectURL(url);
-                alert('图片已保存成功! 📸');
-            }, 'image/png');
+            saveCanvasImage(canvas, `${catName}-${personalityType}-CMBTI.png`);
         }
 
     } catch (error) {

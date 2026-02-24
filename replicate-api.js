@@ -389,14 +389,7 @@ async function downloadAIImage() {
     finalCtx.fillText('🐱 CMBTI 猫咪性格测试 · AI 生成', finalCanvas.width / 2, finalHeight - 30);
 
     // 下载
-    finalCanvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = `${catName}-${personalityType}-AI-CMBTI.png`;
-      link.href = url;
-      link.click();
-      URL.revokeObjectURL(url);
-    }, 'image/png');
+    saveCanvasImage(finalCanvas, `${catName}-${personalityType}-AI-CMBTI.png`);
   } catch (error) {
     console.error('AI image download error:', error);
     alert('保存失败，请尝试长按图片保存');

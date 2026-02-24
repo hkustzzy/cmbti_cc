@@ -213,8 +213,21 @@
         </div>
     </div>
 
+    <!-- 图片保存弹窗 -->
+    <div class="save-modal-overlay" id="save-modal" onclick="closeSaveModal(event)">
+        <div class="save-modal">
+            <div class="save-modal-header">
+                <span>长按图片保存到相册</span>
+                <button class="save-modal-close" onclick="closeSaveModal()">✕</button>
+            </div>
+            <div class="save-modal-body">
+                <img id="save-modal-image" src="" alt="保存图片">
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="replicate-api.js?v=2"></script>
-    <script src="script.js?v=2"></script>
+    <script src="replicate-api.js?v=3"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>
