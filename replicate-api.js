@@ -204,6 +204,36 @@ function updateAIStatus(message) {
   }
 }
 
+// 竞速加载图片：直连和代理同时请求，谁先加载成功用谁
+function raceImageLoad(url1, url2) {
+  return new Promise((resolve) => {
+    let resolved = false;
+    const tryLoad = (url) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        if (!resolved) {
+          resolved = true;
+          resolve(url);
+        }
+      };
+      img.onerror = () => {
+        // 单个失败不处理，等另一个
+      };
+      img.src = url;
+    };
+    tryLoad(url1);
+    tryLoad(url2);
+    // 兜底：5 秒后如果都没成功，用直连 URL
+    setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        resolve(url1);
+      }
+    }, 5000);
+  });
+}
+
 // 主入口：生成 AI 图片
 async function generateAIImage() {
   if (!uploadedCatPhoto || !currentPersonalityType) {
@@ -246,9 +276,14 @@ async function generateAIImage() {
 
     // 显示生成结果
     const resultImg = document.getElementById('ai-result-image');
-    // 线上通过 Edge Function 代理图片，加速国内访问
-    const imageUrl = IS_LOCAL_DEV ? result.output : `/api/image/proxy?url=${encodeURIComponent(result.output)}`;
-    resultImg.src = imageUrl;
+    // 竞速加载：直连和代理同时请求，谁先返回用谁
+    const directUrl = result.output;
+    if (IS_LOCAL_DEV) {
+      resultImg.src = directUrl;
+    } else {
+      const proxyUrl = `/api/image/proxy?url=${encodeURIComponent(directUrl)}`;
+      resultImg.src = await raceImageLoad(directUrl, proxyUrl);
+    }
     loadingSection.style.display = 'none';
     resultSection.style.display = 'block';
   } catch (error) {
