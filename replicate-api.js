@@ -274,15 +274,133 @@ function regenerateAI() {
   generateAIImage();
 }
 
-// 下载 AI 生成的图片
-function downloadAIImage() {
-  const img = document.getElementById('ai-result-image');
-  if (!img || !img.src) return;
+// 下载 AI 生成的图片（canvas 绘制图片+文字信息）
+async function downloadAIImage() {
+  const personalityType = currentPersonalityType;
+  const personality = personalityData[personalityType];
+  if (!personality) return;
 
-  const link = document.createElement('a');
-  link.href = img.src;
-  link.download = `${catName}-${currentPersonalityType}-AI.png`;
-  link.click();
+  try {
+    const aiImg = document.getElementById('ai-result-image');
+    if (!aiImg || !aiImg.src) return;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = 800;
+    canvas.height = 1000;
+
+    // 绘制背景
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#fff5f5');
+    gradient.addColorStop(1, '#ffecd2');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 加载 AI 生成的图片
+    const image = new Image();
+    image.crossOrigin = 'anonymous';
+
+    await new Promise((resolve) => {
+      image.onload = resolve;
+      image.onerror = resolve;
+      image.src = aiImg.src;
+    });
+
+    let textStartY;
+
+    if (image.complete && image.naturalHeight !== 0) {
+      const maxImgWidth = 600;
+      const maxImgHeight = 500;
+      let imgWidth = image.naturalWidth;
+      let imgHeight = image.naturalHeight;
+
+      const scale = Math.min(maxImgWidth / imgWidth, maxImgHeight / imgHeight);
+      imgWidth = imgWidth * scale;
+      imgHeight = imgHeight * scale;
+
+      const imgX = (canvas.width - imgWidth) / 2;
+      const imgY = 80;
+
+      ctx.drawImage(image, imgX, imgY, imgWidth, imgHeight);
+      textStartY = imgY + imgHeight + 60;
+    } else {
+      textStartY = 150;
+    }
+
+    // 绘制标题
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 50px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${catName} 的性格是:`, canvas.width / 2, textStartY);
+
+    // 绘制性格类型
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = 'bold 80px Arial, sans-serif';
+    ctx.fillText(personalityType, canvas.width / 2, textStartY + 100);
+
+    // 绘制称号
+    ctx.fillStyle = '#ff8787';
+    ctx.font = 'bold 45px Arial, sans-serif';
+    ctx.fillText(personality.title, canvas.width / 2, textStartY + 170);
+
+    // 绘制描述（自动换行）
+    ctx.fillStyle = '#555';
+    ctx.font = '28px Arial, sans-serif';
+    const maxWidth = 700;
+    const words = personality.description.split('');
+    let line = '';
+    let y = textStartY + 240;
+
+    for (let i = 0; i < words.length; i++) {
+      const testLine = line + words[i];
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxWidth && i > 0) {
+        ctx.fillText(line, canvas.width / 2, y);
+        line = words[i];
+        y += 35;
+      } else {
+        line = testLine;
+      }
+    }
+    ctx.fillText(line, canvas.width / 2, y);
+
+    // 调整 canvas 高度
+    const finalHeight = Math.max(1000, y + 80);
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = canvas.width;
+    finalCanvas.height = finalHeight;
+    const finalCtx = finalCanvas.getContext('2d');
+
+    // 重绘背景
+    const finalGradient = finalCtx.createLinearGradient(0, 0, 0, finalHeight);
+    finalGradient.addColorStop(0, '#fff5f5');
+    finalGradient.addColorStop(1, '#ffecd2');
+    finalCtx.fillStyle = finalGradient;
+    finalCtx.fillRect(0, 0, finalCanvas.width, finalHeight);
+
+    // 复制内容
+    finalCtx.drawImage(canvas, 0, 0);
+
+    // 绘制底部水印
+    finalCtx.fillStyle = '#aaa';
+    finalCtx.font = '20px Arial, sans-serif';
+    finalCtx.textAlign = 'center';
+    finalCtx.fillText('🐱 CMBTI 猫咪性格测试 · AI 生成', finalCanvas.width / 2, finalHeight - 30);
+
+    // 下载
+    finalCanvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `${catName}-${personalityType}-AI-CMBTI.png`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  } catch (error) {
+    console.error('AI image download error:', error);
+    alert('保存失败，请尝试长按图片保存');
+  }
 }
 
 // 从错误状态重试
