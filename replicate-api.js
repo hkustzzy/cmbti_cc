@@ -246,7 +246,9 @@ async function generateAIImage() {
 
     // 显示生成结果
     const resultImg = document.getElementById('ai-result-image');
-    resultImg.src = result.output;
+    // 线上通过 Edge Function 代理图片，加速国内访问
+    const imageUrl = IS_LOCAL_DEV ? result.output : `/api/image/proxy?url=${encodeURIComponent(result.output)}`;
+    resultImg.src = imageUrl;
     loadingSection.style.display = 'none';
     resultSection.style.display = 'block';
   } catch (error) {
