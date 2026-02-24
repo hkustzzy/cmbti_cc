@@ -111,6 +111,56 @@
                             <p class="personality-desc" id="personality-desc"></p>
                         </div>
                     </div>
+
+                    <!-- AI 生成专属形象功能 (Kontext 图生图) -->
+                    <div class="photo-memory-section">
+                        <div class="memory-section-title">
+                            <span class="sparkle-icon">✨</span>
+                            生成专属换装形象
+                        </div>
+                        <p class="memory-section-desc">上传猫咪照片,AI 将为 TA 换上性格专属的装扮!</p>
+
+                        <div class="upload-area" id="upload-area">
+                            <input type="file" id="cat-photo-upload" accept="image/*" style="display: none;">
+                            <div class="upload-placeholder" onclick="document.getElementById('cat-photo-upload').click()">
+                                <div class="upload-icon">📸</div>
+                                <div class="upload-text">点击上传猫咪照片</div>
+                                <div class="upload-hint">支持 JPG、PNG 格式</div>
+                            </div>
+                            <div class="uploaded-preview" id="uploaded-preview" style="display: none;">
+                                <img id="preview-image" src="" alt="预览">
+                                <button class="change-photo-btn" onclick="document.getElementById('cat-photo-upload').click()">
+                                    更换照片
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="btn-generate-ai" id="btn-generate-ai" onclick="generateAIImage()" disabled>
+                            <span class="btn-icon">🎨</span>
+                            生成专属形象
+                        </button>
+
+                        <div class="ai-loading" id="ai-loading" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text">AI 正在创作中...</div>
+                            <div class="loading-hint">预计需要 20-40 秒</div>
+                        </div>
+
+                        <div class="ai-result" id="ai-result" style="display: none;">
+                            <div class="ai-result-title">✨ AI 生成结果</div>
+                            <img id="ai-generated-image" class="ai-generated-image" src="" alt="AI生成图">
+                            <div class="ai-result-actions">
+                                <button class="btn-secondary" onclick="useGeneratedImage()">
+                                    <span class="btn-icon">✓</span>
+                                    使用这张图
+                                </button>
+                                <button class="btn-secondary" onclick="regenerateAI()">
+                                    <span class="btn-icon">🔄</span>
+                                    重新生成
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="action-buttons">
@@ -152,6 +202,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="liblib-config.js"></script>
+    <script src="kontext-api.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

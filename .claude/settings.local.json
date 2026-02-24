@@ -3,7 +3,20 @@
     "allow": [
       "WebSearch",
       "Bash(open:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "WebFetch(domain:liblibai.feishu.cn)",
+      "WebFetch(domain:www.xingliu.art)",
+      "Bash(curl:*)",
+      "Bash(ls:*)",
+      "Bash(python3 -c:*)",
+      "Bash(unzip:*)",
+      "Bash(node:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)",
+      "Bash(pkill:*)",
+      "Bash(pip3 install:*)",
+      "Bash(xargs:*)",
+      "Bash(python3:*)"
     ]
   }
 }

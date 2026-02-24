@@ -511,6 +511,271 @@ body {
     gap: 15px;
 }
 
+.upload-area {
+    margin: 20px 0;
+}
+
+.upload-placeholder {
+    border: 3px dashed #ffd4d4;
+    border-radius: 20px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: white;
+}
+
+.upload-placeholder:hover {
+    border-color: #ff6b6b;
+    background: #fff5f5;
+    transform: translateY(-2px);
+}
+
+.upload-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.upload-text {
+    font-size: 1.2em;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.upload-hint {
+    font-size: 0.9em;
+    color: #999;
+}
+
+.uploaded-preview {
+    text-align: center;
+}
+
+.uploaded-preview img {
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    margin-bottom: 15px;
+    object-fit: contain;
+}
+
+.change-photo-btn {
+    padding: 8px 20px;
+    background: white;
+    border: 2px solid #ffd4d4;
+    border-radius: 10px;
+    color: #ff6b6b;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    font-family: 'Noto Sans SC', sans-serif;
+}
+
+.change-photo-btn:hover {
+    border-color: #ff6b6b;
+    background: #fff5f5;
+}
+
+.btn-generate-ai {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2em;
+    background: linear-gradient(135deg, #ff6b6b, #ff8787);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: 'Noto Sans SC', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+    margin-top: 20px;
+}
+
+.btn-generate-ai:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+}
+
+.btn-generate-ai:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ai-loading {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid #ffd4d4;
+    border-top-color: #ff6b6b;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 1.2em;
+    color: #ff6b6b;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.loading-hint {
+    font-size: 0.95em;
+    color: #999;
+}
+
+.ai-result {
+    margin-top: 25px;
+    padding: 25px;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.ai-result-title {
+    font-size: 1.3em;
+    color: #ff6b6b;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.ai-generated-image {
+    width: 100%;
+    max-width: 350px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    margin: 0 auto;
+    display: block;
+}
+
+.ai-result-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* ===== 照片留念功能样式 ===== */
+.photo-memory-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px dashed #ffd4d4;
+}
+
+.memory-section-title {
+    font-size: 1.4em;
+    color: #ff6b6b;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.sparkle-icon {
+    font-size: 1.2em;
+    margin-right: 8px;
+}
+
+.memory-section-desc {
+    text-align: center;
+    color: #666;
+    font-size: 1em;
+    margin-bottom: 25px;
+}
+
+.memory-result {
+    margin-top: 25px;
+}
+
+.memory-result-title {
+    font-size: 1.3em;
+    color: #ff6b6b;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.memory-card {
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.memory-images {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.memory-template,
+.memory-user-photo {
+    text-align: center;
+    flex: 1;
+    max-width: 200px;
+}
+
+.memory-template img,
+.memory-user-photo img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #f9f9f9;
+}
+
+.memory-divider {
+    font-size: 2em;
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.image-label {
+    margin-top: 10px;
+    font-size: 0.95em;
+    color: #666;
+    font-weight: 600;
+}
+
+.memory-info {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 2px dashed #ffd4d4;
+}
+
+.memory-personality {
+    font-size: 2em;
+    background: linear-gradient(135deg, #ff6b6b, #ff8787);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+
+.memory-title {
+    font-size: 1.3em;
+    color: #ff8787;
+    font-weight: 700;
+}
+
 /* ===== 所有性格页面样式 ===== */
 .all-header {
     text-align: center;

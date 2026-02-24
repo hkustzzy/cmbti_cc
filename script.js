@@ -179,6 +179,10 @@ let currentQuestion = 0;
 let answers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
 let catName = '';
 let shuffledQuestions = []; // 打乱后的题目顺序
+let uploadedCatPhoto = null; // 用户上传的猫咪照片 (base64)
+let uploadedCatPhotoFile = null; // 用户上传的猫咪照片文件对象
+let currentPersonalityType = ''; // 当前的性格类型
+let currentTemplateImage = ''; // 当前的模板图路径
 
 // 打乱数组顺序
 function shuffleArray(array) {
@@ -312,12 +316,16 @@ function showResult() {
 
     const personality = personalityData[personalityType];
 
+    // 保存当前性格类型和模板图路径
+    currentPersonalityType = personalityType;
+    currentTemplateImage = `cat_icon/${personalityType}.png`;
+
     // 更新结果页面
     document.getElementById('cat-name-display').textContent = `${catName} 的性格是:`;
     document.getElementById('personality-type').textContent = personalityType;
     document.getElementById('personality-title').textContent = personality.title;
     document.getElementById('personality-desc').textContent = personality.description;
-    document.getElementById('result-image').src = `cat_icon/${personalityType}.png`;
+    document.getElementById('result-image').src = currentTemplateImage;
     document.getElementById('result-image').alt = `${personalityType} - ${personality.title}`;
 
     // 显示结果页面
@@ -529,3 +537,14 @@ async function downloadResult() {
         alert('保存失败~ 😿\n建议使用截屏功能保存结果');
     }
 }
+
+// 页面加载完成后初始化照片上传功能
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎨 初始化 AI 生成功能...');
+    if (typeof initPhotoUpload === 'function') {
+        initPhotoUpload();
+        console.log('✅ 照片上传功能已初始化');
+    } else {
+        console.warn('⚠️ initPhotoUpload 函数未找到,请检查 kontext-api.js 是否正确加载');
+    }
+});
