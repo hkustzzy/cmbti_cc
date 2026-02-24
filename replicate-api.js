@@ -276,14 +276,7 @@ async function generateAIImage() {
 
     // 显示生成结果
     const resultImg = document.getElementById('ai-result-image');
-    // 竞速加载：直连和代理同时请求，谁先返回用谁
-    const directUrl = result.output;
-    if (IS_LOCAL_DEV) {
-      resultImg.src = directUrl;
-    } else {
-      const proxyUrl = `/api/image/proxy?url=${encodeURIComponent(directUrl)}`;
-      resultImg.src = await raceImageLoad(directUrl, proxyUrl);
-    }
+    resultImg.src = result.output;
     loadingSection.style.display = 'none';
     resultSection.style.display = 'block';
   } catch (error) {
