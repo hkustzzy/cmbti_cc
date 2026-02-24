@@ -179,6 +179,9 @@ let currentQuestion = 0;
 let answers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
 let catName = '';
 let shuffledQuestions = []; // 打乱后的题目顺序
+let uploadedCatPhoto = null;       // base64
+let uploadedCatPhotoFile = null;   // File 对象
+let currentPersonalityType = '';   // 当前性格类型
 
 // 打乱数组顺序
 function shuffleArray(array) {
@@ -311,6 +314,7 @@ function showResult() {
         (answers.J > answers.P ? 'J' : 'P');
 
     const personality = personalityData[personalityType];
+    currentPersonalityType = personalityType;
 
     // 更新结果页面
     document.getElementById('cat-name-display').textContent = `${catName} 的性格是:`;
@@ -320,16 +324,47 @@ function showResult() {
     document.getElementById('result-image').src = `cat_icon/${personalityType}.png`;
     document.getElementById('result-image').alt = `${personalityType} - ${personality.title}`;
 
+    // 重置 AI 生成区域状态
+    resetAISection();
+
     // 显示结果页面
     showPage('result-page');
+
+    // 初始化照片上传功能
+    initPhotoUpload();
 }
 
 // 重新测试
 function restartTest() {
     currentQuestion = 0;
     answers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+    uploadedCatPhoto = null;
+    uploadedCatPhotoFile = null;
+    currentPersonalityType = '';
     showPage('welcome-page');
     document.getElementById('cat-name').value = '';
+}
+
+// 重置 AI 生成区域
+function resetAISection() {
+    uploadedCatPhoto = null;
+    uploadedCatPhotoFile = null;
+
+    const preview = document.getElementById('cat-photo-preview');
+    const uploadArea = document.getElementById('cat-photo-upload-area');
+    const generateBtn = document.getElementById('ai-generate-btn');
+    const loading = document.getElementById('ai-loading');
+    const result = document.getElementById('ai-result');
+    const error = document.getElementById('ai-error');
+    const fileInput = document.getElementById('cat-photo-input');
+
+    if (preview) preview.style.display = 'none';
+    if (uploadArea) uploadArea.classList.remove('has-photo');
+    if (generateBtn) { generateBtn.disabled = true; generateBtn.style.display = ''; }
+    if (loading) loading.style.display = 'none';
+    if (result) result.style.display = 'none';
+    if (error) error.style.display = 'none';
+    if (fileInput) fileInput.value = '';
 }
 
 // 分享结果

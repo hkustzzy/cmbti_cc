@@ -127,6 +127,68 @@
                         分享结果
                     </button>
                 </div>
+
+                <!-- AI 生成区域 -->
+                <div class="ai-section">
+                    <div class="ai-section-title">
+                        <span class="ai-icon">🎨</span>
+                        AI 专属形象生成
+                    </div>
+                    <p class="ai-section-desc">上传你家猫咪的照片，AI 将为它穿上专属性格装扮!</p>
+
+                    <!-- 照片上传区域 -->
+                    <div class="cat-photo-upload-area" id="cat-photo-upload-area">
+                        <input type="file" id="cat-photo-input" accept="image/*" style="display: none;">
+                        <div class="upload-placeholder" id="upload-placeholder">
+                            <span class="upload-icon">📷</span>
+                            <span class="upload-text">点击或拖拽上传猫咪照片</span>
+                            <span class="upload-hint">支持 JPG、PNG 格式</span>
+                        </div>
+                        <div class="cat-photo-preview" id="cat-photo-preview" style="display: none;">
+                            <img id="cat-photo-preview-img" src="" alt="猫咪照片预览">
+                        </div>
+                    </div>
+
+                    <!-- 生成按钮 -->
+                    <button class="btn-ai-generate" id="ai-generate-btn" onclick="generateAIImage()" disabled>
+                        <span class="btn-icon">✨</span>
+                        生成 AI 专属形象
+                    </button>
+
+                    <!-- 加载状态 -->
+                    <div class="ai-loading" id="ai-loading" style="display: none;">
+                        <div class="ai-spinner"></div>
+                        <p class="ai-status-text" id="ai-status-text">正在生成中...</p>
+                        <p class="ai-loading-hint">AI 创作需要一些时间，请耐心等待</p>
+                    </div>
+
+                    <!-- 生成结果 -->
+                    <div class="ai-result" id="ai-result" style="display: none;">
+                        <div class="ai-result-image-wrapper">
+                            <img id="ai-result-image" src="" alt="AI 生成结果">
+                        </div>
+                        <div class="ai-result-actions">
+                            <button class="btn-primary" onclick="downloadAIImage()">
+                                <span class="btn-icon">📸</span>
+                                保存 AI 图片
+                            </button>
+                            <button class="btn-secondary" onclick="regenerateAI()">
+                                <span class="btn-icon">🔄</span>
+                                重新生成
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 错误状态 -->
+                    <div class="ai-error" id="ai-error" style="display: none;">
+                        <span class="ai-error-icon">😿</span>
+                        <p class="ai-error-message" id="ai-error-message">生成失败，请稍后重试</p>
+                        <button class="btn-secondary" onclick="retryAI()">
+                            <span class="btn-icon">🔄</span>
+                            重试
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -152,6 +214,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="replicate-api.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
