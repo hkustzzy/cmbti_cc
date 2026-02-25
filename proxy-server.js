@@ -4,15 +4,38 @@
 const http = require('http');
 const https = require('https');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
-// 从 liblib-config.js 读取配置
-const ACCESS_KEY = '***REDACTED_ACCESS_KEY***';
-const SECRET_KEY = '***REDACTED_SECRET_KEY***';
+// 从 .env 文件读取密钥
+function loadEnv() {
+    try {
+        const envPath = path.join(__dirname, '.env');
+        const content = fs.readFileSync(envPath, 'utf8');
+        const vars = {};
+        content.split('\n').forEach(line => {
+            const [key, ...rest] = line.split('=');
+            if (key && rest.length) vars[key.trim()] = rest.join('=').trim();
+        });
+        return vars;
+    } catch (e) {
+        return {};
+    }
+}
+
+const envVars = loadEnv();
+const ACCESS_KEY = process.env.LIBLIB_ACCESS_KEY || envVars.LIBLIB_ACCESS_KEY || '';
+const SECRET_KEY = process.env.LIBLIB_SECRET_KEY || envVars.LIBLIB_SECRET_KEY || '';
 const BASE_URL = 'openapi.liblibai.cloud';
 
-console.log('🔑 使用的密钥:');
-console.log('   AccessKey:', ACCESS_KEY);
-console.log('   SecretKey:', SECRET_KEY.substring(0, 10) + '...');
+if (!ACCESS_KEY || !SECRET_KEY) {
+    console.error('❌ 缺少密钥，请在 .env 文件中配置 LIBLIB_ACCESS_KEY 和 LIBLIB_SECRET_KEY');
+    process.exit(1);
+}
+
+console.log('🔑 密钥已从 .env 加载');
+console.log('   AccessKey:', ACCESS_KEY.substring(0, 8) + '...');
+console.log('   SecretKey:', SECRET_KEY.substring(0, 8) + '...');
 
 // 生成签名
 function generateSignature(uri, timestamp, nonce) {
@@ -50,12 +73,6 @@ function proxyRequest(clientReq, clientRes, uri, body) {
     const signature = generateSignature(uri, timestamp, nonce);
 
     console.log(`📤 转发请求: ${uri}`);
-    console.log(`   完整 URL: https://${BASE_URL}${uri}`);
-    console.log(`   Timestamp: ${timestamp}`);
-    console.log(`   Nonce: ${nonce}`);
-    console.log(`   AccessKey: ${ACCESS_KEY}`);
-    console.log(`   Signature: ${signature}`);
-    console.log(`   原始请求体:`, body || '(空)');
 
     // 使用阿里云 API 网关标准格式 (小写 x-ca- 前缀)
     const options = {

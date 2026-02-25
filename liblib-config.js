@@ -4,8 +4,8 @@
 const LIBLIB_CONFIG = {
     // ============ 认证信息 (必填) ============
     // 在 liblib.art 个人中心 → 开发者设置 获取
-    ACCESS_KEY: '***REDACTED_ACCESS_KEY***',
-    SECRET_KEY: '***REDACTED_SECRET_KEY***',
+    ACCESS_KEY: 'CONFIGURED_VIA_ENV',
+    SECRET_KEY: 'CONFIGURED_VIA_ENV',
 
     // ============ API 配置 ============
     BASE_URL: 'https://openapi.liblibai.cloud',

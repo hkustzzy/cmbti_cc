@@ -144,7 +144,7 @@ async function generateSignature(uri, timestamp, nonce, secretKey) {
 async function uploadImageToOSS(file, fileName) {
     const config = LIBLIB_CONFIG;
 
-    if (!config.ACCESS_KEY || config.ACCESS_KEY === 'YOUR_ACCESS_KEY_HERE') {
+    if (!config.ACCESS_KEY || config.ACCESS_KEY === 'YOUR_ACCESS_KEY_HERE' || config.ACCESS_KEY === 'YOUR_ACCESS_KEY') {
         throw new Error('请先在 liblib-config.js 中配置 ACCESS_KEY 和 SECRET_KEY');
     }
 

@@ -1,0 +1,8 @@
+.env
+.DS_Store
+.claude/
+local-proxy.js
+
+# Tencent Cloud EdgeOne
+.edgeone/*
+.tef_dist/*
