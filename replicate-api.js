@@ -1,17 +1,16 @@
-// replicate-api.js - 前端 AI 图片生成功能
+// ai-generate.js - 前端 AI 图片生成功能（Seedream 5.0 lite）
 
-// 本地开发模式：localhost 时走本地代理 8089，线上走 Edge Function
-const IS_LOCAL_DEV = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-const API_BASE = IS_LOCAL_DEV ? 'http://localhost:8089' : '';
+// 本地开发模式：局域网/localhost 走本地代理 8089，线上走 Edge Function
+const IS_LOCAL_DEV = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || /^192\.168\./.test(location.hostname) || /^10\./.test(location.hostname) || /^172\.(1[6-9]|2\d|3[01])\./.test(location.hostname);
+const API_BASE = IS_LOCAL_DEV ? `http://192.168.2.107:8089` : '';
 
 const AI_CONFIG = {
-  POLL_INTERVAL: 3000,    // 轮询间隔 3 秒
-  MAX_POLL_TIME: 300000,  // 最大等待时间 5 分钟
   MAX_IMAGE_SIZE: 1024,   // 图片最大尺寸
   JPEG_QUALITY: 0.9,      // JPEG 压缩质量
 };
 
-const AI_PROMPT = "Use the cat from image 2, apply the costume, scene, and expression from image 1. CRITICAL: The cat in the result MUST be a photorealistic copy of the exact same cat from image 2. Strictly preserve the cat's breed, fur color, fur pattern, markings, eye color, face shape, ear shape, nose color, and body proportions from image 2. If image 2 shows a Ragdoll cat, the result must clearly be a Ragdoll with the same color points and blue eyes. Do not simplify, stylize, or alter the cat's real appearance. Use a white background.";
+// Prompt 模板：让 Seedream 保持猫咪外观，cosplay 到性格插画的场景/服装
+const AI_PROMPT = "参考图1是一只猫咪的真实照片，参考图2是一只穿着特定服装、处于特定场景中的猫咪插画。请生成一张新图片：将图1中猫咪的真实外观（品种、毛色、花纹、眼睛颜色、脸型）完整保留，让它穿上图2中的服装，放入图2中的场景，同时参考图2中猫咪的表情和神态。最终效果要像是图1的猫咪在cosplay图2的角色。保持高质量、可爱、适合社交媒体分享的画风。白色背景。";
 
 // 将图片压缩并转为 base64 data URL
 function compressImageToDataURL(source) {
@@ -59,141 +58,58 @@ function readFileAsDataURL(file) {
   });
 }
 
-// 初始化照片上传功能
+// 点击按钮弹出文件选择（先清空旧值，确保重选同一文件也能触发）
+function triggerAIUpload() {
+  const fileInput = document.getElementById('cat-photo-input');
+  fileInput.value = '';
+  fileInput.click();
+}
+
+// 初始化照片上传：选完文件直接开始生成
 let _photoUploadInited = false;
 function initPhotoUpload() {
   if (_photoUploadInited) return;
   _photoUploadInited = true;
 
   const fileInput = document.getElementById('cat-photo-input');
-  const preview = document.getElementById('cat-photo-preview');
-  const previewImg = document.getElementById('cat-photo-preview-img');
-  const uploadArea = document.getElementById('cat-photo-upload-area');
-  const generateBtn = document.getElementById('ai-generate-btn');
-
   if (!fileInput) return;
 
   fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // 验证文件类型
     if (!file.type.startsWith('image/')) {
       alert('请上传图片文件');
       return;
     }
 
-    // 验证文件大小（10MB 以内）
     if (file.size > 10 * 1024 * 1024) {
       alert('图片文件过大，请上传 10MB 以内的图片');
       return;
     }
 
     uploadedCatPhotoFile = file;
+    uploadedCatPhoto = await readFileAsDataURL(file);
 
-    // 显示预览
-    const dataURL = await readFileAsDataURL(file);
-    uploadedCatPhoto = dataURL;
-    previewImg.src = dataURL;
-    preview.style.display = 'block';
-    uploadArea.classList.add('has-photo');
-    generateBtn.disabled = false;
-  });
-
-  // 点击上传区域触发文件选择
-  uploadArea.addEventListener('click', () => {
-    fileInput.click();
-  });
-
-  // 拖拽上传
-  uploadArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadArea.classList.add('drag-over');
-  });
-
-  uploadArea.addEventListener('dragleave', () => {
-    uploadArea.classList.remove('drag-over');
-  });
-
-  uploadArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadArea.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      // 触发 file input 的 change 事件
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      fileInput.files = dt.files;
-      fileInput.dispatchEvent(new Event('change'));
-    }
+    // 选完直接开始生成
+    generateAIImage();
   });
 }
 
-// 提交生成任务
-async function submitGeneration(prompt, inputImages) {
+// 提交生成请求（Seedream 是同步接口，直接返回结果）
+async function submitGeneration(prompt, images) {
   const response = await fetch(`${API_BASE}/api/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt: prompt,
-      input_images: inputImages,
-    }),
+    body: JSON.stringify({ prompt, images }),
   });
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Request failed' }));
-    throw new Error(error.error || error.detail || 'Failed to submit generation');
+    throw new Error(error.error || error.detail || 'Generation failed');
   }
 
   return response.json();
-}
-
-// 轮询生成状态
-function pollStatus(predictionId) {
-  return new Promise((resolve, reject) => {
-    const startTime = Date.now();
-
-    const poll = async () => {
-      if (Date.now() - startTime > AI_CONFIG.MAX_POLL_TIME) {
-        reject(new Error('Generation timed out'));
-        return;
-      }
-
-      try {
-        const response = await fetch(`${API_BASE}/api/status/${predictionId}`);
-        if (!response.ok) throw new Error('Failed to check status');
-        const data = await response.json();
-
-        if (IS_LOCAL_DEV) {
-          // 本地代理直接返回 Replicate 原始响应
-          if (data.status === 'succeeded') {
-            resolve(data);
-            return;
-          }
-          if (data.status === 'failed') {
-            reject(new Error(data.error || 'Generation failed'));
-            return;
-          }
-        } else {
-          if (data.status === 'succeeded') {
-            resolve(data);
-            return;
-          }
-          if (data.status === 'failed') {
-            reject(new Error(data.error || 'Generation failed'));
-            return;
-          }
-        }
-
-        updateAIStatus(data.status === 'processing' ? 'AI 正在创作中...' : '正在排队等待...');
-        setTimeout(poll, AI_CONFIG.POLL_INTERVAL);
-      } catch (error) {
-        reject(error);
-      }
-    };
-
-    poll();
-  });
 }
 
 // 更新 AI 状态显示
@@ -204,36 +120,6 @@ function updateAIStatus(message) {
   }
 }
 
-// 竞速加载图片：直连和代理同时请求，谁先加载成功用谁
-function raceImageLoad(url1, url2) {
-  return new Promise((resolve) => {
-    let resolved = false;
-    const tryLoad = (url) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        if (!resolved) {
-          resolved = true;
-          resolve(url);
-        }
-      };
-      img.onerror = () => {
-        // 单个失败不处理，等另一个
-      };
-      img.src = url;
-    };
-    tryLoad(url1);
-    tryLoad(url2);
-    // 兜底：5 秒后如果都没成功，用直连 URL
-    setTimeout(() => {
-      if (!resolved) {
-        resolved = true;
-        resolve(url1);
-      }
-    }, 5000);
-  });
-}
-
 // 主入口：生成 AI 图片
 async function generateAIImage() {
   if (!uploadedCatPhoto || !currentPersonalityType) {
@@ -241,54 +127,56 @@ async function generateAIImage() {
     return;
   }
 
-  const generateBtn = document.getElementById('ai-generate-btn');
+  const entryBtn = document.getElementById('btn-ai-entry');
   const loadingSection = document.getElementById('ai-loading');
-  const resultSection = document.getElementById('ai-result');
   const errorSection = document.getElementById('ai-error');
+  const resultImage = document.getElementById('result-image');
 
   // 切换 UI 状态
-  generateBtn.disabled = true;
-  generateBtn.style.display = 'none';
+  entryBtn.style.display = 'none';
   loadingSection.style.display = 'block';
-  resultSection.style.display = 'none';
   errorSection.style.display = 'none';
 
   try {
     updateAIStatus('正在压缩图片...');
 
-    // 将性格结果图转为压缩的 base64 data URL
-    const personalityImageUrl = await compressImageToDataURL(`cat_icon/${currentPersonalityType}.png`);
+    // 图1: 用户猫咪照片（真实外观）
+    const catPhotoDataUrl = await compressImageToDataURL(uploadedCatPhotoFile);
 
-    // 将用户上传的猫咪照片压缩
-    const catPhotoUrl = await compressImageToDataURL(uploadedCatPhotoFile);
+    // 图2: 性格结果插画（服装/场景参考）
+    const personalityImageDataUrl = await compressImageToDataURL(`cat_icon/${currentPersonalityType}.png`);
 
-    updateAIStatus('正在提交生成任务...');
+    updateAIStatus('AI 正在生成中，请稍等...');
 
-    // 提交生成任务
-    // input_images[0] (image 1): 性格结果图（包含装扮场景）
-    // input_images[1] (image 2): 用户猫咪照片（包含猫咪真实外观）
-    const prediction = await submitGeneration(AI_PROMPT, [personalityImageUrl, catPhotoUrl]);
+    // Seedream 同步接口，一次请求直接返回结果
+    const result = await submitGeneration(AI_PROMPT, [catPhotoDataUrl, personalityImageDataUrl]);
 
-    updateAIStatus('正在排队等待...');
+    if (result.status !== 'succeeded' || !result.output) {
+      throw new Error('生成失败，请重试');
+    }
 
-    // 轮询状态直到完成
-    const result = await pollStatus(prediction.id);
+    // 替换分享卡片中的猫咪图片
+    resultImage.src = result.output;
 
-    // 显示生成结果
-    const resultImg = document.getElementById('ai-result-image');
-    resultImg.src = result.output;
+    // 保存到隐藏的 ai-result-image（downloadAIImage 备用）
+    const aiResultImg = document.getElementById('ai-result-image');
+    if (aiResultImg) aiResultImg.src = result.output;
+
     loadingSection.style.display = 'none';
-    resultSection.style.display = 'block';
+
+    // 按钮变成"重新生成"，点击再次触发文件选择
+    entryBtn.innerHTML = `🔄 重新生成<span id="ai-entry-cat-name">${catName}</span>的专属形象`;
+    entryBtn.style.display = '';
+    entryBtn.onclick = triggerAIUpload;
   } catch (error) {
     console.error('AI generation error:', error);
     loadingSection.style.display = 'none';
     errorSection.style.display = 'block';
+    entryBtn.style.display = '';
     const errorMsg = document.getElementById('ai-error-message');
     if (errorMsg) {
       errorMsg.textContent = error.message || 'AI 生成失败，请稍后重试';
     }
-  } finally {
-    generateBtn.disabled = !uploadedCatPhoto;
   }
 }
 
@@ -304,7 +192,7 @@ function regenerateAI() {
   generateAIImage();
 }
 
-// 下载 AI 生成的图片（canvas 绘制图片+文字信息）
+// 下载 AI 生成的图片（canvas 绘制图片+文字信息+金句+二维码）
 async function downloadAIImage() {
   const personalityType = currentPersonalityType;
   const personality = personalityData[personalityType];
@@ -317,8 +205,8 @@ async function downloadAIImage() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
-    canvas.width = 800;
-    canvas.height = 1000;
+    canvas.width = 750;
+    canvas.height = 2000; // 临时大画布，最后裁切
 
     // 绘制背景
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -337,66 +225,79 @@ async function downloadAIImage() {
       image.src = aiImg.src;
     });
 
-    let textStartY;
+    let currentY = 45;
+
+    // 绘制顶部标语
+    ctx.fillStyle = '#ff8787';
+    ctx.font = '500 24px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🐱 全网最火的猫咪 MBTI 测试', canvas.width / 2, currentY);
+    currentY += 40;
 
     if (image.complete && image.naturalHeight !== 0) {
-      const maxImgWidth = 600;
-      const maxImgHeight = 500;
+      const maxImgWidth = 400;
+      const maxImgHeight = 360;
       let imgWidth = image.naturalWidth;
       let imgHeight = image.naturalHeight;
-
       const scale = Math.min(maxImgWidth / imgWidth, maxImgHeight / imgHeight);
       imgWidth = imgWidth * scale;
       imgHeight = imgHeight * scale;
 
       const imgX = (canvas.width - imgWidth) / 2;
-      const imgY = 80;
-
-      ctx.drawImage(image, imgX, imgY, imgWidth, imgHeight);
-      textStartY = imgY + imgHeight + 60;
+      const padding = 10;
+      ctx.fillStyle = 'white';
+      roundRect(ctx, imgX - padding, currentY - padding, imgWidth + padding * 2, imgHeight + padding * 2, 20);
+      ctx.fill();
+      ctx.drawImage(image, imgX, currentY, imgWidth, imgHeight);
+      currentY += imgHeight + 35;
     } else {
-      textStartY = 150;
+      currentY = 150;
     }
 
-    // 绘制标题
-    ctx.fillStyle = '#333';
-    ctx.font = 'bold 50px Arial, sans-serif';
+    // 绘制猫名
+    ctx.fillStyle = '#666';
+    ctx.font = '500 30px Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(`${catName} 的性格是:`, canvas.width / 2, textStartY);
+    ctx.fillText(`${catName} 的性格是:`, canvas.width / 2, currentY);
+    currentY += 65;
 
-    // 绘制性格类型
+    // 绘制 类型 · 称号（合为一行）
     ctx.fillStyle = '#ff6b6b';
-    ctx.font = 'bold 80px Arial, sans-serif';
-    ctx.fillText(personalityType, canvas.width / 2, textStartY + 100);
+    ctx.font = 'bold 52px Arial, sans-serif';
+    ctx.fillText(`${personalityType} · ${personality.title}`, canvas.width / 2, currentY);
+    currentY += 60;
 
-    // 绘制称号
-    ctx.fillStyle = '#ff8787';
-    ctx.font = 'bold 45px Arial, sans-serif';
-    ctx.fillText(personality.title, canvas.width / 2, textStartY + 170);
-
-    // 绘制描述（自动换行）
-    ctx.fillStyle = '#555';
-    ctx.font = '28px Arial, sans-serif';
-    const maxWidth = 700;
-    const words = personality.description.split('');
-    let line = '';
-    let y = textStartY + 240;
-
-    for (let i = 0; i < words.length; i++) {
-      const testLine = line + words[i];
-      const metrics = ctx.measureText(testLine);
-      if (metrics.width > maxWidth && i > 0) {
-        ctx.fillText(line, canvas.width / 2, y);
-        line = words[i];
-        y += 35;
+    // 绘制金句
+    ctx.fillStyle = '#e74c3c';
+    ctx.font = 'bold 28px Arial, sans-serif';
+    const quoteText = personality.quote;
+    const maxQuoteWidth = 650;
+    const quoteChars = quoteText.split('');
+    let quoteLine = '';
+    const quoteLines = [];
+    for (let i = 0; i < quoteChars.length; i++) {
+      const testLine = quoteLine + quoteChars[i];
+      if (ctx.measureText(testLine).width > maxQuoteWidth && i > 0) {
+        quoteLines.push(quoteLine);
+        quoteLine = quoteChars[i];
       } else {
-        line = testLine;
+        quoteLine = testLine;
       }
     }
-    ctx.fillText(line, canvas.width / 2, y);
+    quoteLines.push(quoteLine);
 
-    // 调整 canvas 高度
-    const finalHeight = Math.max(1000, y + 80);
+    for (const line of quoteLines) {
+      ctx.fillText(line, canvas.width / 2, currentY);
+      currentY += 38;
+    }
+
+    currentY += 35;
+
+    // 底部区域：二维码 + 品牌水印（紧贴内容）
+    const qrSize = 80;
+    const footerY = currentY;
+    const finalHeight = footerY + 110;
+
     const finalCanvas = document.createElement('canvas');
     finalCanvas.width = canvas.width;
     finalCanvas.height = finalHeight;
@@ -408,17 +309,34 @@ async function downloadAIImage() {
     finalGradient.addColorStop(1, '#ffecd2');
     finalCtx.fillStyle = finalGradient;
     finalCtx.fillRect(0, 0, finalCanvas.width, finalHeight);
-
-    // 复制内容
     finalCtx.drawImage(canvas, 0, 0);
 
-    // 绘制底部水印
-    finalCtx.fillStyle = '#aaa';
-    finalCtx.font = '20px Arial, sans-serif';
-    finalCtx.textAlign = 'center';
-    finalCtx.fillText('🐱 CMBTI 猫咪性格测试 · AI 生成', finalCanvas.width / 2, finalHeight - 30);
+    // 绘制分隔线
+    finalCtx.strokeStyle = 'rgba(255, 107, 107, 0.2)';
+    finalCtx.setLineDash([6, 4]);
+    finalCtx.beginPath();
+    finalCtx.moveTo(100, footerY);
+    finalCtx.lineTo(finalCanvas.width - 100, footerY);
+    finalCtx.stroke();
+    finalCtx.setLineDash([]);
 
-    // 下载
+    // 绘制二维码
+    const qrX = finalCanvas.width / 2 - qrSize - 40;
+    await drawQRCodeToCanvas(finalCtx, qrX, footerY + 15, qrSize);
+
+    // 绘制品牌文字
+    const textX = finalCanvas.width / 2 + 20;
+    finalCtx.fillStyle = '#ff6b6b';
+    finalCtx.font = 'bold 28px Arial, sans-serif';
+    finalCtx.textAlign = 'left';
+    finalCtx.fillText('CMBTI', textX, footerY + 42);
+    finalCtx.fillStyle = '#888';
+    finalCtx.font = '18px Arial, sans-serif';
+    finalCtx.fillText('猫咪性格测试 · AI 生成', textX, footerY + 68);
+    finalCtx.fillStyle = '#aaa';
+    finalCtx.font = '14px Arial, sans-serif';
+    finalCtx.fillText('扫码测你家主子', textX, footerY + 90);
+
     saveCanvasImage(finalCanvas, `${catName}-${personalityType}-AI-CMBTI.png`);
   } catch (error) {
     console.error('AI image download error:', error);
@@ -428,10 +346,9 @@ async function downloadAIImage() {
 
 // 从错误状态重试
 function retryAI() {
-  const generateBtn = document.getElementById('ai-generate-btn');
   const errorSection = document.getElementById('ai-error');
+  const entryBtn = document.getElementById('btn-ai-entry');
 
   errorSection.style.display = 'none';
-  generateBtn.style.display = '';
-  generateBtn.disabled = !uploadedCatPhoto;
+  if (entryBtn) entryBtn.style.display = '';
 }

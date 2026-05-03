@@ -426,82 +426,294 @@ body {
     text-align: center;
 }
 
-.result-badge {
-    display: inline-block;
-    font-size: 1.1em;
-    color: white;
-    background: linear-gradient(135deg, #ff6b6b, #ff8787);
-    padding: 10px 28px;
-    border-radius: 25px;
-    margin-bottom: 25px;
-    font-weight: 700;
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+/* ===== 分享卡片（截图友好） ===== */
+.share-card-slogan {
+    font-size: 0.85em;
+    color: #ff8787;
+    font-weight: 600;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
 }
 
-.result-card {
+.share-card {
     background: linear-gradient(135deg, #fff8f8, #ffecd2);
     border-radius: 22px;
-    padding: 30px;
-    margin-bottom: 25px;
+    padding: 24px 20px 20px;
+    margin-bottom: 20px;
     box-shadow: inset 0 2px 10px rgba(255, 107, 107, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
-.result-image-wrapper {
-    margin-bottom: 25px;
-}
-
-.result-image {
-    width: 100%;
-    max-width: 350px;
-    height: auto;
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-    object-fit: contain;
-    border: 4px solid white;
-}
-
-.cat-name-display {
-    font-size: 1.6em;
-    color: #333;
-    margin-bottom: 15px;
-    font-weight: 700;
-}
-
-.personality-type-wrapper {
-    margin: 20px 0;
-}
-
-.personality-type {
+.share-card-image-wrapper {
+    margin-bottom: 16px;
+    position: relative;
     display: inline-block;
-    font-size: 3em;
-    background: linear-gradient(135deg, #ff6b6b, #ff8787, #ffa5a5);
+}
+
+.btn-ai-entry {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    background: linear-gradient(135deg, #9b6dd7, #7b5ea7);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 12px 20px;
+    font-size: 0.95em;
+    font-weight: 700;
+    font-family: 'Noto Sans SC', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(155, 109, 215, 0.4);
+    transition: all 0.3s;
+    z-index: 2;
+    animation: ai-entry-pulse 2s ease-in-out infinite;
+}
+
+.btn-ai-entry:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(155, 109, 215, 0.6);
+}
+
+.btn-ai-entry:active {
+    transform: scale(0.97);
+}
+
+@keyframes ai-entry-pulse {
+    0%, 100% { box-shadow: 0 4px 15px rgba(155, 109, 215, 0.5); }
+    50% { box-shadow: 0 4px 20px rgba(155, 109, 215, 0.8); }
+}
+
+/* AI 内联上传区域 */
+.ai-inline {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.ai-inline .cat-photo-upload-area {
+    flex: 1;
+    background: white;
+    border: 2px dashed #d4b3ff;
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-inline .cat-photo-upload-area:hover {
+    border-color: #9b6dd7;
+    background: #faf5ff;
+}
+
+.ai-inline .upload-placeholder {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-inline .upload-icon {
+    font-size: 1.2em;
+    opacity: 0.6;
+}
+
+.ai-inline .upload-text {
+    font-size: 0.85em;
+    color: #888;
+    font-weight: 500;
+}
+
+.ai-inline .cat-photo-preview img {
+    max-width: 60px;
+    max-height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.ai-inline .has-photo .upload-placeholder {
+    display: none;
+}
+
+.ai-inline .btn-ai-generate {
+    padding: 10px 18px;
+    font-size: 0.9em;
+    font-weight: 700;
+    font-family: 'Noto Sans SC', sans-serif;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #9b6dd7, #7b5ea7);
+    color: white;
+    box-shadow: 0 4px 12px rgba(155, 109, 215, 0.4);
+    white-space: nowrap;
+    transition: all 0.3s;
+}
+
+.ai-inline .btn-ai-generate:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.ai-inline .btn-ai-generate:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(155, 109, 215, 0.5);
+}
+
+/* AI 内联加载/错误状态 */
+.share-card-image-wrapper .ai-loading {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.share-card-image-wrapper .ai-loading .ai-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #e0d0f0;
+    border-top-color: #9b6dd7;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+.share-card-image-wrapper .ai-loading .ai-status-text {
+    font-size: 0.9em;
+    color: #7b5ea7;
+    font-weight: 600;
+}
+
+.share-card-image-wrapper .ai-error {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.share-card-image-wrapper .ai-error .ai-error-icon {
+    font-size: 1.5em;
+}
+
+.share-card-image-wrapper .ai-error .ai-error-message {
+    font-size: 0.85em;
+    color: #d63031;
+    margin: 5px 0;
+}
+
+.share-card-image-wrapper .result-image {
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    object-fit: contain;
+    border: 3px solid white;
+}
+
+.share-card-info {
+    margin-bottom: 16px;
+}
+
+.share-card-info .cat-name-display {
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+/* 类型 · 称号 合为一行 */
+.personality-headline {
+    font-size: 2em;
+    font-weight: 900;
+    color: #ff6b6b;
+    margin: 8px 0 12px;
+    letter-spacing: 1px;
+}
+
+.personality-headline #personality-type {
+    background: linear-gradient(135deg, #ff6b6b, #ff8787);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-shadow: 0 2px 10px rgba(255, 107, 107, 0.2);
 }
 
-.personality-title {
-    font-size: 1.7em;
+.personality-headline #personality-title {
     color: #ff8787;
-    margin-bottom: 20px;
-    font-weight: 700;
 }
 
-.personality-desc-wrapper {
-    background: white;
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.personality-desc {
+.personality-quote {
     font-size: 1.1em;
+    color: #e74c3c;
+    font-weight: 700;
+    line-height: 1.6;
+    padding: 8px 16px;
+    background: rgba(255, 107, 107, 0.08);
+    border-radius: 12px;
+    display: inline-block;
+    max-width: 90%;
+}
+
+.share-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(255, 107, 107, 0.25);
+}
+
+.share-card-qr {
+    flex-shrink: 0;
+}
+
+.share-card-qr canvas,
+.share-card-qr img {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 6px;
+}
+
+.share-card-brand {
+    text-align: left;
+}
+
+.share-card-brand .brand-name {
+    font-size: 1.3em;
+    font-weight: 900;
+    color: #ff6b6b;
+    letter-spacing: 1px;
+}
+
+.share-card-brand .brand-desc {
+    font-size: 0.85em;
+    color: #888;
+    font-weight: 500;
+}
+
+.share-card-brand .brand-hint {
+    font-size: 0.75em;
+    color: #aaa;
+    margin-top: 2px;
+}
+
+/* 详细描述（卡片内） */
+.share-card .personality-desc-wrapper {
+    background: white;
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin: 16px 0 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.share-card .personality-desc {
+    font-size: 0.95em;
     color: #555;
     line-height: 1.8;
     font-weight: 500;
+    text-align: left;
 }
 
 .action-buttons {
@@ -968,28 +1180,34 @@ body {
         margin-bottom: 20px;
     }
 
-    .result-card {
-        padding: 25px 20px;
+    .share-card {
+        padding: 20px 16px 16px;
     }
 
-    .result-image {
-        max-width: 280px;
+    .share-card-image-wrapper .result-image {
+        max-width: 200px;
     }
 
-    .cat-name-display {
-        font-size: 1.4em;
-    }
-
-    .personality-type {
-        font-size: 2.5em;
-    }
-
-    .personality-title {
-        font-size: 1.4em;
-    }
-
-    .personality-desc {
+    .share-card-info .cat-name-display {
         font-size: 1em;
+    }
+
+    .personality-headline {
+        font-size: 1.7em;
+    }
+
+    .personality-quote {
+        font-size: 1em;
+    }
+
+    .share-card-qr canvas,
+    .share-card-qr img {
+        width: 64px !important;
+        height: 64px !important;
+    }
+
+    .share-card .personality-desc {
+        font-size: 0.9em;
     }
 
     .personalities-grid {
