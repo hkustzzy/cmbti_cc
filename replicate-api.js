@@ -2,7 +2,7 @@
 
 // 本地开发模式：局域网/localhost 走本地代理 8089，线上走 Edge Function
 const IS_LOCAL_DEV = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || /^192\.168\./.test(location.hostname) || /^10\./.test(location.hostname) || /^172\.(1[6-9]|2\d|3[01])\./.test(location.hostname);
-const API_BASE = IS_LOCAL_DEV ? `http://192.168.2.107:8089` : 'https://cmbit.zhaoziyuan1991.workers.dev';
+const API_BASE = IS_LOCAL_DEV ? `http://192.168.2.107:8089` : '';
 
 const AI_CONFIG = {
   MAX_IMAGE_SIZE: 1024,   // 图片最大尺寸
