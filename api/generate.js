@@ -1,5 +1,38 @@
 // Vercel Serverless Function - CMBTI AI 图片生成代理（火山方舟 Seedream 5.0 lite）
-// 环境变量：ARK_API_KEY
+// 环境变量：ARK_API_KEY, JSONBIN_KEY
+
+const JSONBIN_ID = '69f89346856a682189a4e9aa';
+
+// 异步存日志，不阻塞响应
+async function logToJsonBin(record) {
+  try {
+    const key = process.env.JSONBIN_KEY;
+    if (!key) return;
+
+    // 读取现有记录
+    const getResp = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}/latest`, {
+      headers: { 'X-Master-Key': key },
+    });
+    const data = await getResp.json();
+    const records = (data.record && data.record.records) || [];
+
+    // 追加新记录（最多保留 500 条）
+    records.push(record);
+    if (records.length > 500) records.splice(0, records.length - 500);
+
+    // 写回
+    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': key,
+      },
+      body: JSON.stringify({ records }),
+    });
+  } catch (e) {
+    console.error('[logToJsonBin] error:', e.message);
+  }
+}
 
 export default async function handler(req, res) {
   // CORS headers
@@ -64,6 +97,14 @@ export default async function handler(req, res) {
     if (imgData && imgData.url) {
       // 打印 URL 到日志，方便在 Vercel Logs 里查看生成的图片（URL 24小时有效）
       console.log(`[generate] 生成成功! 图片URL: ${imgData.url}`);
+
+      // 异步存到 JSONBin（不阻塞响应）
+      logToJsonBin({
+        time: new Date().toISOString(),
+        imageUrl: imgData.url,
+        prompt: prompt.substring(0, 100),
+      });
+
       // 下载图片转 base64 返回给前端（解决跨域）
       const imgResp = await fetch(imgData.url);
       const imgBuf = await imgResp.arrayBuffer();
