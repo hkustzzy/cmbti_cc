@@ -5,8 +5,8 @@ const IS_LOCAL_DEV = location.hostname === 'localhost' || location.hostname === 
 const API_BASE = IS_LOCAL_DEV ? `http://192.168.2.107:8089` : '';
 
 const AI_CONFIG = {
-  MAX_IMAGE_SIZE: 1024,   // 图片最大尺寸
-  JPEG_QUALITY: 0.9,      // JPEG 压缩质量
+  MAX_IMAGE_SIZE: 768,    // 图片最大尺寸（缩小减少传输时间）
+  JPEG_QUALITY: 0.8,      // JPEG 压缩质量
 };
 
 // Prompt 模板：让 Seedream 保持猫咪外观，cosplay 到性格插画的场景/服装
@@ -176,7 +176,13 @@ async function generateAIImage() {
     entryBtn.style.display = '';
     const errorMsg = document.getElementById('ai-error-message');
     if (errorMsg) {
-      errorMsg.textContent = error.message || 'AI 生成失败，请稍后重试';
+      if (error.message === 'Failed to fetch') {
+        errorMsg.textContent = '网络连接失败，请检查网络后重试';
+      } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+        errorMsg.textContent = 'AI 生成超时，请重试';
+      } else {
+        errorMsg.textContent = error.message || 'AI 生成失败，请稍后重试';
+      }
     }
   }
 }

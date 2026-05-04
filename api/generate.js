@@ -27,6 +27,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing required fields: prompt, images' });
     }
 
+    console.log(`[generate] prompt: ${prompt.substring(0, 60)}..., images: ${images.length}, sizes: ${images.map(i => Math.round(i.length/1024) + 'KB').join(', ')}`);
+
     const response = await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations', {
       method: 'POST',
       headers: {
