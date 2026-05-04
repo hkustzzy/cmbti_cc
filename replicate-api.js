@@ -98,7 +98,7 @@ function initPhotoUpload() {
 
 // 提交生成请求（Seedream 是同步接口，直接返回结果）
 async function submitGeneration(prompt, images) {
-  const apiUrl = IS_LOCAL_DEV ? `${API_BASE}/api/generate` : API_BASE;
+  const apiUrl = `${API_BASE}/api/generate`;
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
