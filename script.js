@@ -349,7 +349,7 @@ function showResult() {
     const qrContainer = document.getElementById('share-qrcode');
     qrContainer.innerHTML = '';
     new QRCode(qrContainer, {
-        text: 'https://cmbti-cc.vercel.app/',
+        text: 'https://cmbit.chat/',
         width: 72,
         height: 72,
         colorDark: '#ff6b6b',
@@ -488,7 +488,7 @@ function drawQRCodeToCanvas(ctx, x, y, size) {
             tempDiv.style.display = 'none';
             document.body.appendChild(tempDiv);
             new QRCode(tempDiv, {
-                text: 'https://cmbti-cc.vercel.app/',
+                text: 'https://cmbit.chat/',
                 width: size,
                 height: size,
                 colorDark: '#ff6b6b',
