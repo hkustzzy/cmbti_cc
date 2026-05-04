@@ -645,7 +645,7 @@ body {
 }
 
 .personality-quote {
-    font-size: 1.1em;
+    font-size: 1em;
     color: #e74c3c;
     font-weight: 700;
     line-height: 1.6;
@@ -653,7 +653,7 @@ body {
     background: rgba(255, 107, 107, 0.08);
     border-radius: 12px;
     display: inline-block;
-    max-width: 90%;
+    max-width: 95%;
 }
 
 .share-card-footer {
@@ -1197,7 +1197,8 @@ body {
     }
 
     .personality-quote {
-        font-size: 1em;
+        font-size: 0.85em;
+        padding: 6px 12px;
     }
 
     .share-card-qr canvas,
