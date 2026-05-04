@@ -41,7 +41,7 @@ export default async function handler(req, res) {
         image: images,
         size: '2K',
         sequential_image_generation: 'disabled',
-        response_format: 'b64_json',
+        response_format: 'url',
         stream: false,
         watermark: false,
       }),
@@ -61,10 +61,17 @@ export default async function handler(req, res) {
 
     const imgData = result.data && result.data[0];
     let imageOutput;
-    if (imgData && imgData.b64_json) {
+    if (imgData && imgData.url) {
+      // 打印 URL 到日志，方便在 Vercel Logs 里查看生成的图片（URL 24小时有效）
+      console.log(`[generate] 生成成功! 图片URL: ${imgData.url}`);
+      // 下载图片转 base64 返回给前端（解决跨域）
+      const imgResp = await fetch(imgData.url);
+      const imgBuf = await imgResp.arrayBuffer();
+      const base64 = Buffer.from(imgBuf).toString('base64');
+      imageOutput = `data:image/jpeg;base64,${base64}`;
+    } else if (imgData && imgData.b64_json) {
+      console.log(`[generate] 生成成功! (base64)`);
       imageOutput = `data:image/jpeg;base64,${imgData.b64_json}`;
-    } else if (imgData && imgData.url) {
-      imageOutput = imgData.url;
     }
 
     if (!imageOutput) {
