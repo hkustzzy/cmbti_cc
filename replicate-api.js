@@ -122,11 +122,24 @@ function updateAIStatus(message) {
 }
 
 // 主入口：生成 AI 图片
+// AI 生成频率限制：每个用户每 60 秒只能生成 1 次
+let _lastGenerateTime = 0;
+const GENERATE_COOLDOWN = 60000; // 60 秒冷却
+
 async function generateAIImage() {
   if (!uploadedCatPhoto || !currentPersonalityType) {
     alert('请先上传猫咪照片');
     return;
   }
+
+  // 频率限制
+  const now = Date.now();
+  if (now - _lastGenerateTime < GENERATE_COOLDOWN) {
+    const remainSec = Math.ceil((GENERATE_COOLDOWN - (now - _lastGenerateTime)) / 1000);
+    alert(`AI 生成中请稍候，${remainSec} 秒后可再次生成`);
+    return;
+  }
+  _lastGenerateTime = now;
 
   const entryBtn = document.getElementById('btn-ai-entry');
   const loadingSection = document.getElementById('ai-loading');

@@ -1,6 +1,25 @@
 // Vercel Serverless Function - CMBTI AI 图片生成代理（火山方舟 Seedream 5.0 lite）
 // 环境变量：ARK_API_KEY, JSONBIN_KEY
 
+// 简易 IP 限流（内存，serverless 冷启动会重置，但能挡住大部分恶意请求）
+const ipRateLimit = {};
+const RATE_LIMIT_WINDOW = 60000; // 60 秒
+const RATE_LIMIT_MAX = 3; // 每 IP 每分钟最多 3 次
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  if (!ipRateLimit[ip]) {
+    ipRateLimit[ip] = { count: 1, start: now };
+    return true;
+  }
+  if (now - ipRateLimit[ip].start > RATE_LIMIT_WINDOW) {
+    ipRateLimit[ip] = { count: 1, start: now };
+    return true;
+  }
+  ipRateLimit[ip].count++;
+  return ipRateLimit[ip].count <= RATE_LIMIT_MAX;
+}
+
 // 异步存日志到 JSONBin（每条记录创建一个新 bin，不读旧数据，快）
 async function logToJsonBin(record) {
   try {
@@ -39,6 +58,12 @@ export default async function handler(req, res) {
   const ARK_API_KEY = process.env.ARK_API_KEY;
   if (!ARK_API_KEY) {
     return res.status(500).json({ error: 'Missing ARK_API_KEY' });
+  }
+
+  // IP 限流
+  const clientIP = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
+  if (!checkRateLimit(clientIP)) {
+    return res.status(429).json({ error: '请求太频繁，请稍后再试' });
   }
 
   try {
