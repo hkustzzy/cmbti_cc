@@ -666,7 +666,13 @@ async function downloadResult() {
 
     } catch (error) {
         console.error('下载错误:', error);
-        alert('保存失败~ 😿\n建议使用截屏功能保存结果');
+        // canvas 失败时（如跨域），弹出原图让用户长按保存
+        const img = document.getElementById('result-image');
+        if (img && img.src) {
+            showSaveModal(img.src);
+        } else {
+            alert('保存失败~ 😿\n建议使用截屏功能保存结果');
+        }
     }
 }
 

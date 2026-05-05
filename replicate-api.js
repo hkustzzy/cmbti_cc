@@ -5,8 +5,8 @@ const IS_LOCAL_DEV = location.hostname === 'localhost' || location.hostname === 
 const API_BASE = IS_LOCAL_DEV ? `http://192.168.2.107:8089` : '';
 
 const AI_CONFIG = {
-  MAX_IMAGE_SIZE: 768,    // 图片最大尺寸（缩小减少传输时间）
-  JPEG_QUALITY: 0.8,      // JPEG 压缩质量
+  MAX_IMAGE_SIZE: 512,    // 图片最大尺寸（进一步缩小加速生成）
+  JPEG_QUALITY: 0.7,      // JPEG 压缩质量
 };
 
 // Prompt 模板：让 Seedream 保持猫咪外观，cosplay 到性格插画的场景/服装
